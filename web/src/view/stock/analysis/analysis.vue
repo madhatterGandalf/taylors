@@ -74,6 +74,9 @@
         <el-form-item>
           <el-button @click="onSubmit" type="primary">查询</el-button>
         </el-form-item>
+        <el-form-item>
+          <el-button @click="downBek" type="primary">下载</el-button>
+        </el-form-item>
       </el-form>
     </div>
     <el-table :data="tableData" border stripe :default-sort = "{prop: ['f20','f2','f3','f10','f5','f6'], order: 'descending'}">
@@ -152,6 +155,21 @@
         this.pageSize = 10
         this.getTableData()
       },
+
+      downBek() {
+        var bodyStr = "\r\n"
+        var data = this.tableData
+        for (var i =0; i<data.length; i++){
+          bodyStr += data[i].f12 + "\r\n"
+        }
+
+        const element = document.createElement('a')
+        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(bodyStr))
+        element.setAttribute('download', "top.BEK")
+        element.style.display = 'none'
+        element.click()
+      },
+
       async addStockMonitorDay(row) {
         const res = await addMonitor({isDay:false,code: row.f12})
         if (res.code === 0) {
