@@ -9,7 +9,7 @@
     },
     "dependencies": {
         "@moefe/vue-aplayer": "^2.0.0-beta.5",
-        "axios": "^0.19.2",
+        "axios": "^0.21.1",
         "core-js": "^2.6.11",
         "echarts": "^4.8.0",
         "element-ui": "^2.13.2",
