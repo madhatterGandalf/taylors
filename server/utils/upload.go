@@ -7,7 +7,6 @@ import (
 	"github.com/qiniu/api.v7/storage"
 	"mime/multipart"
 	"taylors/global"
-	"taylors/logger"
 	"time"
 )
 
@@ -41,7 +40,6 @@ func Upload(file *multipart.FileHeader) (err error, path string, key string) {
 	fileKey := fmt.Sprintf("%d%s", time.Now().Unix(), file.Filename) // 文件名格式 自己可以改 建议保证唯一性
 	err = formUploader.Put(context.Background(), &ret, upToken, fileKey, f, dataLen, &putExtra)
 	if err != nil {
-		logger.Error("upload file fail:", err)
 		return err, "", ""
 	}
 	return err, global.GVA_CONFIG.Qiniu.ImgPath + "/" + ret.Key, ret.Key

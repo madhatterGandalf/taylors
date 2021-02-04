@@ -40,7 +40,7 @@ func NewDongFangCrawler() *dongFangCrawler {
 	return dongFangCrawlerObj
 }
 
-func (crawler *dongFangCrawler) get(url string) (body []byte, err error) {
+func (crawler *dongFangCrawler) getBody(url string) (body []byte, err error) {
 	rsp, err := http.Get(url)
 	if err != nil {
 		return
@@ -98,7 +98,7 @@ func (crawler *dongFangCrawler) process() (dongFang *dongFang) {
 		recover()
 	}()
 
-	body, err := crawler.get(crawler.url)
+	body, err := crawler.getBody(crawler.url)
 	if err != nil {
 		return
 	}

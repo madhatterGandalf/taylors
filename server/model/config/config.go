@@ -59,8 +59,9 @@ type Captcha struct {
 }
 
 type Log struct {
-	Level    string `mapstructure:"level" json:"level" yaml:"level"`
-	FileName string `mapstructure:"file-name" json:"file-name" yaml:"file-name"`
+	Level       string `mapstructure:"level" json:"level" yaml:"level"`
+	FileName    string `mapstructure:"file-name" json:"file-name" yaml:"file-name"`
+	Environment string `mapstructure:"environment" json:"environment" yaml:"environment"`
 }
 
 type Sqlite struct {

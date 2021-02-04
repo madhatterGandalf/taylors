@@ -1,43 +1,50 @@
 package logger
 
 import (
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
-	"gopkg.in/natefinch/lumberjack.v2"
+	log "github.com/sirupsen/logrus"
+	"os"
+	"taylors/utils"
 )
 
-// error logger
-var errorLogger *zap.SugaredLogger
+var errorLogger *log.Logger
 
-var levelMap = map[string]zapcore.Level{
-	"debug":  zapcore.DebugLevel,
-	"info":   zapcore.InfoLevel,
-	"warn":   zapcore.WarnLevel,
-	"error":  zapcore.ErrorLevel,
-	"dpanic": zapcore.DPanicLevel,
-	"panic":  zapcore.PanicLevel,
-	"fatal":  zapcore.FatalLevel,
-}
-
-func getLoggerLevel(lvl string) zapcore.Level {
-	if level, ok := levelMap[lvl]; ok {
-		return level
+func Init(path string, is_dev bool, level string) {
+	if is_dev {
+		init_dev()
+	} else {
+		init_standard(path, level)
 	}
-	return zapcore.InfoLevel
 }
 
-func Init(fileName string, levelStr string) {
-	syncWriter := zapcore.AddSync(&lumberjack.Logger{
-		Filename:  fileName,
-		MaxSize:   1 << 30, //1G
-		LocalTime: true,
-		Compress:  true,
-	})
-	encoder := zap.NewProductionEncoderConfig()
-	encoder.EncodeTime = zapcore.ISO8601TimeEncoder
-	core := zapcore.NewCore(zapcore.NewJSONEncoder(encoder), syncWriter, zap.NewAtomicLevelAt(getLoggerLevel(levelStr)))
-	logger := zap.New(core, zap.AddCaller(), zap.AddCallerSkip(1))
-	errorLogger = logger.Sugar()
+func init_dev() {
+	log.SetFormatter(&log.JSONFormatter{})
+	log.SetOutput(os.Stdout)
+	log.SetLevel(log.DebugLevel)
+	errorLogger = log.StandardLogger()
+}
+
+func init_standard(path, level string) {
+	if !utils.FileExist(path) {
+		_, err := os.Create(path)
+		if err != nil {
+			panic("初始化日志路径失败-创建路径失败")
+		}
+	}
+
+	outPutFile, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE, os.ModeAppend)
+	if err != nil {
+		panic(err)
+	}
+
+	lev, err := log.ParseLevel(level)
+	if err != nil {
+		panic(err)
+	}
+
+	log.SetFormatter(&log.JSONFormatter{})
+	log.SetOutput(outPutFile)
+	log.SetLevel(lev)
+	errorLogger = log.StandardLogger()
 }
 
 func Debug(args ...interface{}) {
@@ -70,14 +77,6 @@ func Error(args ...interface{}) {
 
 func Errorf(template string, args ...interface{}) {
 	errorLogger.Errorf(template, args...)
-}
-
-func DPanic(args ...interface{}) {
-	errorLogger.DPanic(args...)
-}
-
-func DPanicf(template string, args ...interface{}) {
-	errorLogger.DPanicf(template, args...)
 }
 
 func Panic(args ...interface{}) {

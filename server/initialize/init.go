@@ -1,19 +1,22 @@
 package initialize
 
-import "taylors/global"
+import (
+	"taylors/config"
+	"taylors/global"
+)
 
 func Init() {
+	err := config.Init()
+	if err != nil {
+		panic("配置错误")
+	}
+
 	Log()
 	switch global.GVA_CONFIG.System.DbType {
 	case "mysql":
 		Mysql()
 	}
 	DBTables()
-
-	// 程序结束前关闭数据库链接
-	defer func() {
-		_ = global.GVA_DB.Close()
-	}()
 
 	if global.GVA_CONFIG.System.UseMultipoint {
 		// 初始化redis服务
@@ -22,4 +25,9 @@ func Init() {
 
 	Cron()
 	Crawler()
+}
+
+// 程序结束前
+func Close() {
+	_ = global.GVA_DB.Close()
 }

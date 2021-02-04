@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"taylors/config"
 	"taylors/global"
 	"taylors/initialize"
 	"taylors/logger"
@@ -22,11 +21,8 @@ import (
 // @name x-token
 // @BasePath /
 func main() {
-	err := config.Init()
-	if err != nil {
-		panic("配置错误")
-	}
 	initialize.Init()
+	defer initialize.Close()
 
 	Router := Routers()
 	Router.Static("/form-generator", "./resource/page")
